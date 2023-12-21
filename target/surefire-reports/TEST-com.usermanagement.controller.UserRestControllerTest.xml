@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.usermanagement.UserManagementApplicationTests" time="0.001" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.usermanagement.controller.UserRestControllerTest" time="3.454" tests="9" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -52,5 +52,13 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="contextLoads" classname="com.usermanagement.UserManagementApplicationTests" time="0"/>
+  <testcase name="saveUser" classname="com.usermanagement.controller.UserRestControllerTest" time="0.336"/>
+  <testcase name="listAllUsers" classname="com.usermanagement.controller.UserRestControllerTest" time="0.055"/>
+  <testcase name="updateUser" classname="com.usermanagement.controller.UserRestControllerTest" time="0.006"/>
+  <testcase name="findUserById" classname="com.usermanagement.controller.UserRestControllerTest" time="0.005"/>
+  <testcase name="resetPassword" classname="com.usermanagement.controller.UserRestControllerTest" time="0.005"/>
+  <testcase name="fetchLIU" classname="com.usermanagement.controller.UserRestControllerTest" time="0.019"/>
+  <testcase name="generateToken" classname="com.usermanagement.controller.UserRestControllerTest" time="0.004"/>
+  <testcase name="deleteUserById" classname="com.usermanagement.controller.UserRestControllerTest" time="0.007"/>
+  <testcase name="fetchAllUsersExceptLIU" classname="com.usermanagement.controller.UserRestControllerTest" time="0.027"/>
 </testsuite>

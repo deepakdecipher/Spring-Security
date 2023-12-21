@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.usermanagement.UserManagementApplicationTests" time="0.001" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.usermanagement.service.UserServiceImplTest" time="0.103" tests="11" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -52,5 +52,15 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="contextLoads" classname="com.usermanagement.UserManagementApplicationTests" time="0"/>
+  <testcase name="findByFullName" classname="com.usermanagement.service.UserServiceImplTest" time="0.08"/>
+  <testcase name="findAll" classname="com.usermanagement.service.UserServiceImplTest" time="0.007"/>
+  <testcase name="findLIU" classname="com.usermanagement.service.UserServiceImplTest" time="0.001"/>
+  <testcase name="findById" classname="com.usermanagement.service.UserServiceImplTest" time="0.001"/>
+  <testcase name="updateUser" classname="com.usermanagement.service.UserServiceImplTest" time="0.001"/>
+  <testcase name="resetPassword" classname="com.usermanagement.service.UserServiceImplTest" time="0.002"/>
+  <testcase name="save" classname="com.usermanagement.service.UserServiceImplTest" time="0.001"/>
+  <testcase name="findByUserName" classname="com.usermanagement.service.UserServiceImplTest" time="0.001"/>
+  <testcase name="addRoleToUser" classname="com.usermanagement.service.UserServiceImplTest" time="0.001"/>
+  <testcase name="findUsersExceptLIU" classname="com.usermanagement.service.UserServiceImplTest" time="0.001"/>
+  <testcase name="deleteUserById" classname="com.usermanagement.service.UserServiceImplTest" time="0"/>
 </testsuite>

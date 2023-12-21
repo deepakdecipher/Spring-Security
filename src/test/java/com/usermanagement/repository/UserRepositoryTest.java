@@ -1,4 +1,3 @@
-/*
 package com.usermanagement.repository;
 
 import com.usermanagement.modelentity.Role;
@@ -62,4 +61,4 @@ class UserRepositoryTest {
                 .userName("username1").password(passwordEncoder.encode("password1"))
                 .roles(roles).build();
     }
-}*/
+}

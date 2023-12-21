@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.usermanagement.UserManagementApplicationTests" time="0.001" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.usermanagement.repository.UserRepositoryTest" time="0.017" tests="2" errors="2" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -52,5 +52,16 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="contextLoads" classname="com.usermanagement.UserManagementApplicationTests" time="0"/>
+  <testcase name="findByUserFullName" classname="com.usermanagement.repository.UserRepositoryTest" time="0.015">
+    <error message="Cannot invoke &quot;org.springframework.security.crypto.password.PasswordEncoder.encode(java.lang.CharSequence)&quot; because &quot;this.passwordEncoder&quot; is null" type="java.lang.NullPointerException">java.lang.NullPointerException: Cannot invoke "org.springframework.security.crypto.password.PasswordEncoder.encode(java.lang.CharSequence)" because "this.passwordEncoder" is null
+	at com.usermanagement.repository.UserRepositoryTest.getUser(UserRepositoryTest.java:64)
+	at com.usermanagement.repository.UserRepositoryTest.findByUserFullName(UserRepositoryTest.java:46)
+</error>
+  </testcase>
+  <testcase name="findByUserName" classname="com.usermanagement.repository.UserRepositoryTest" time="0.001">
+    <error message="Cannot invoke &quot;org.springframework.security.crypto.password.PasswordEncoder.encode(java.lang.CharSequence)&quot; because &quot;this.passwordEncoder&quot; is null" type="java.lang.NullPointerException">java.lang.NullPointerException: Cannot invoke "org.springframework.security.crypto.password.PasswordEncoder.encode(java.lang.CharSequence)" because "this.passwordEncoder" is null
+	at com.usermanagement.repository.UserRepositoryTest.getUser(UserRepositoryTest.java:64)
+	at com.usermanagement.repository.UserRepositoryTest.findByUserName(UserRepositoryTest.java:54)
+</error>
+  </testcase>
 </testsuite>
