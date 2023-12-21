@@ -1,0 +1,31 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test1
+    username: tagdev
+    password: tagdev
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+email-configuration:
+  smtp-host: smtp.gmail.com
+  smtp-port: 587
+  smtp-username: deepak.sharma@decipherzone.com
+  smtp-password: ljwi csex vagf xvql
+  smtp-email-from: deepak.sharma@decipherzone.com
+  smtp-email-subject: Otp-verification
+  otp-length: 4
+  otp-validity: 3
+  username: deepak.sharma
+  email: bhupendra.birla@decipherzone.com
+
+expiration-minutes: 5
