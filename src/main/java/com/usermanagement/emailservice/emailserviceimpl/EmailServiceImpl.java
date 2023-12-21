@@ -20,12 +20,12 @@ import static com.usermanagement.emailconfig.EmailConstant.*;
 public class EmailServiceImpl implements EmailService {
 
     @Override
-    public void sendInternalServerErrorEmailNotification(String userName, String userEmail, String fromEmail, String subject, String message, JavaMailSenderImpl javaMailSender) {
+    public void sendInternalServerErrorEmailNotification(String userEmail, String fromEmail, String subject, String message, JavaMailSenderImpl javaMailSender) {
         log.info("Execution started for sendNotificationEmail()");
-        prepareAndSendInternalServerErrorEmailNotification(userName, userEmail, fromEmail, subject, message, javaMailSender);
+        prepareAndSendInternalServerErrorEmailNotification(userEmail, fromEmail, subject, message, javaMailSender);
     }
 
-    private void prepareAndSendInternalServerErrorEmailNotification(String userName, String userEmail, String fromEmail, String subject, String body, JavaMailSenderImpl javaMailSender) {
+    private void prepareAndSendInternalServerErrorEmailNotification(String userEmail, String fromEmail, String subject, String body, JavaMailSenderImpl javaMailSender) {
 
         Properties props = javaMailSender.getJavaMailProperties();
         props.put(MAIL_TRANSPORT_PROTOCOL, "smtp");
