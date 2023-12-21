@@ -1,4 +1,1 @@
-com/usermanagement/controller/UserRestControllerTest.class
-com/usermanagement/service/UserServiceImplTest.class
-com/usermanagement/repository/UserRepositoryTest.class
 com/usermanagement/UserManagementApplicationTests.class
