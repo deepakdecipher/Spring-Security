@@ -1,0 +1,6 @@
+spring:
+  data:
+    mongodb:
+      database: usermanagementdummy
+      host: localhost
+      port: 27017
