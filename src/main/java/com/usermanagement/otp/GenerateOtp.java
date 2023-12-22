@@ -2,6 +2,7 @@ package com.usermanagement.otp;
 
 import com.google.common.cache.LoadingCache;
 import com.usermanagement.exception.EmailNotFoundException;
+import com.usermanagement.exception.OtpExpiredException;
 import com.usermanagement.exception.UserAlreadyExistsException;
 import com.usermanagement.modelentity.User;
 import com.usermanagement.repository.UserRepository;
@@ -39,25 +40,13 @@ public class GenerateOtp {
 
     public boolean validateOtp(String otp,String emailId)  {
         try {
-            return oneTimePasswordCache.get(emailId).equals(otp);
+            if(oneTimePasswordCache.get(emailId).equals(otp)) {
+                return true;
+            }else {
+                throw new OtpExpiredException("Otp Expired. Please try again.");
+            }
         } catch (ExecutionException e) {
-            throw new com.usermanagement.exception.ExecutionException(e.getMessage());
+            throw new com.usermanagement.exception.ExecutionException("Otp is not valid. Please try again.");
         }
     }
-
-   /* public ResponseEntity<?> verifyOtp(String otp)
-            throws ExecutionException {
-
-        if (validateOtp(user, forgotPasswordChangeRequest.getOtp())) {
-            user.setPassword(passwordEncoder.encode(forgotPasswordChangeRequest.getNewPassword()));
-            userRepository.save(user);
-
-            oneTimePasswordCache.invalidate(user.getId());
-
-            response.put(OtpConstants.MESSAGE, OtpConstants.PASSWORD_CHANGE_SUCCESS);
-            response.put(OtpConstants.TIMESTAMP, LocalDateTime.now().toString());
-            return ResponseEntity.ok(response.toString());
-        } else
-            throw new OneTimePasswordValidationFailureException();
-    }*/
 }

@@ -70,4 +70,8 @@ public class ExceptionControllerAdvice extends RuntimeException {
     public ResponseEntity<ExceptionResponse> emailProcessException(EmailProcessException ex) {
         return new ResponseEntity<>(new ExceptionResponse(400, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<ExceptionResponse> otpExpiredException(OtpExpiredException ex) {
+        return new ResponseEntity<>(new ExceptionResponse(400, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 }

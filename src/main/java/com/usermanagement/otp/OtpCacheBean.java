@@ -28,7 +28,7 @@ public class OtpCacheBean {
         return CacheBuilder.newBuilder().expireAfterWrite(expirationMinutes, TimeUnit.MINUTES)
                 .build(new CacheLoader<>() {
                     public String load(String key) {
-                        return "default";
+                        return key;
                     }
                 });
     }
