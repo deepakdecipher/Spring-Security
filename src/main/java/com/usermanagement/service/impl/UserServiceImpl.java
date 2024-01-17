@@ -171,12 +171,17 @@ public class UserServiceImpl implements UserService {
     public String generateOtp(String emailId) {
         AtomicReference<String> otpResponse = new AtomicReference<>();
         userRepository.findByEmail(emailId).ifPresentOrElse(user -> {
-            // Prepare Otp
             otpResponse.set(prepareOtp(emailId));
         },()-> {
             throw new EmailNotFoundException("Email not found. Please enter the correct email id.");
         });
        return otpResponse.get();
+    }
+
+    @Override
+    public String verifyOtp(String otp, String emailId) {
+        generateOtp.validateOtp(otp, emailId);
+        return null;
     }
 
     @Override
@@ -284,8 +289,8 @@ public class UserServiceImpl implements UserService {
         javaMailSender.setSession(session);
         String content = prepareEmailBody(emailId);
         emailNotificationProperties.setSmtpEmailSubject("OTP Verification "+new Date());
-        emailService.sendInternalServerErrorEmailNotification(emailNotificationProperties.getUserName(),
-                emailNotificationProperties.getEmail(), emailNotificationProperties.getSmtpEmailFrom(),
+        emailService.sendInternalServerErrorEmailNotification(
+                emailId, emailNotificationProperties.getSmtpEmailFrom(),
                 emailNotificationProperties.getSmtpEmailSubject(), content, javaMailSender);
         return JSONObject.quote("Otp sent to mail. Please check and verify the otp");
     }
@@ -293,8 +298,9 @@ public class UserServiceImpl implements UserService {
     private String prepareEmailBody(String emailId) {
         StringWriter stringWriter = new StringWriter();
         VelocityContext velocityContext = new VelocityContext();
-        velocityContext.put("otp", generateOtp.generateOtp(emailId));
-       // velocityContext.put("otp", generateOtp(emailNotificationProperties.getOtpLength()));
+        JSONObject jsonObject = generateOtp.generateOtp(emailId);
+        velocityContext.put("message", jsonObject.get("message"));
+        velocityContext.put("otp", jsonObject.get("One Time Password"));
         String utf8 = "UTF-8";
         velocityEngine.mergeTemplate("velocity/opt-generation.vm", utf8, velocityContext, stringWriter);
         return stringWriter.toString();

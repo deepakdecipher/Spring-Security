@@ -31,5 +31,6 @@ public interface UserService {
 
     String addRoleToUser(AssignRolesToUser assignRolesToUser);
     String generateOtp(String emailId);
+    String verifyOtp(String Otp, String emailId);
 
 }

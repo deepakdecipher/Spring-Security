@@ -25,5 +25,6 @@ public class User {
     private String email;
     @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private Set<Role> roles;
+    private Boolean isVerified;
 
 }

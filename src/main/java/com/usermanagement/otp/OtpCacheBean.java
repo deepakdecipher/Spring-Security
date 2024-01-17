@@ -23,12 +23,12 @@ public class OtpCacheBean {
     private final OneTimePasswordConfigurationProperties oneTimePasswordConfigurationProperties;
 
     @Bean
-    public LoadingCache<Long, Integer> loadingCache() {
+    public LoadingCache<String, String> loadingCache() {
         final var expirationMinutes = oneTimePasswordConfigurationProperties.getExpirationMinutes();
         return CacheBuilder.newBuilder().expireAfterWrite(expirationMinutes, TimeUnit.MINUTES)
                 .build(new CacheLoader<>() {
-                    public Integer load(Long key) {
-                        return 0;
+                    public String load(String key) {
+                        return key;
                     }
                 });
     }

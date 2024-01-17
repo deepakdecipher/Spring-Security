@@ -104,4 +104,10 @@ public class UserRestController {
     public ResponseEntity<String> generateOtp(@PathVariable("emailId") String emailId) {
         return new ResponseEntity<>(userService.generateOtp(emailId), HttpStatus.OK);
     }
+    //VERIFY OTP
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+    @PostMapping(value = "/verify-otp/{otp}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> verifyOtp(@PathVariable("otp") String otp, @RequestParam("emailId") String emailId) {
+        return new ResponseEntity<>(userService.verifyOtp(otp, emailId), HttpStatus.OK);
+    }
 }
