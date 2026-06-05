@@ -1,31 +1,46 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# application.yml — STANDALONE mode (run the library as its own Spring Boot app)
+#
+# When this library is included as a dependency in another project, the
+# consuming app provides its own application.yaml with these values.
+# ─────────────────────────────────────────────────────────────────────────────
+
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/test1
-    username: tagdev
-    password: tagdev
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/usermanagement}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${JPA_DDL_AUTO:update}
     show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-    database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: ${SMTP_HOST:smtp.gmail.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
-email-configuration:
-  smtp-host: smtp.gmail.com
-  smtp-port: 587
-  smtp-username: deepak.sharma@decipherzone.com
-  smtp-password: ljwi csex vagf xvql
-  smtp-email-from: deepak.sharma@decipherzone.com
-  smtp-email-subject: Otp-verification
-  otp-length: 4
-  otp-validity: 3
-  username: deepak.sharma
-  email: bhupendra.birla@decipherzone.com
-
-expiration-minutes: 5
+# ── user-management library settings ─────────────────────────────────────────
+user-management:
+  api:
+    user-base-path: /userApi     # override to change all user API URLs
+    role-base-path: /roleApi
+  jwt:
+    secret: ${JWT_SECRET:dGhpcyBpcyBhIHNlY3JldCBrZXkgZm9yIEpXVCB0b2tlbiBnZW5lcmF0aW9u}
+    token-validity-ms: ${JWT_TOKEN_VALIDITY_MS:1200000}          # 20 min
+    refresh-token-validity-ms: ${JWT_REFRESH_VALIDITY_MS:3600000} # 1 h
+  otp:
+    expiration-minutes: ${OTP_EXPIRY_MINUTES:5}
+    length: ${OTP_LENGTH:6}
+  email:
+    from: ${EMAIL_FROM:no-reply@example.com}
+    subject: ${EMAIL_SUBJECT:"Your OTP verification code"}
+    enabled: ${EMAIL_ENABLED:true}

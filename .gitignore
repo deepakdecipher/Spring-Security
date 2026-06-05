@@ -1,0 +1,56 @@
+# ── Compiled output ───────────────────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# ── Maven wrapper ─────────────────────────────────────────────────────────────
+.mvn/wrapper/maven-wrapper.jar
+
+# ── IntelliJ IDEA ─────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ── Eclipse / STS ─────────────────────────────────────────────────────────────
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+
+# ── VS Code ───────────────────────────────────────────────────────────────────
+.vscode/
+
+# ── NetBeans ──────────────────────────────────────────────────────────────────
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+build/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Environment / secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+*.local
+application-local.yml
+application-local.yaml
+application-local.properties
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+logs/
+*.log

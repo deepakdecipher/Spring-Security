@@ -1,50 +1,38 @@
 package com.usermanagement.jwt;
 
+import com.usermanagement.exception.BadCredentialsException;
+import com.usermanagement.exception.UsernameNotFoundException;
 import com.usermanagement.modelrequest.JwtRequest;
 import com.usermanagement.modelresponse.JwtResponse;
 import com.usermanagement.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtUtil jwtUtil;
 
     @Override
     public JwtResponse generateToken(JwtRequest jwtRequest) {
         try {
-            return extractToken(jwtRequest);
-        } catch (Exception ex) {
-           throw new BadCredentialsException(ex.getMessage());
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(jwtRequest.getEmail(), jwtRequest.getPassword()));
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException ex) {
+            throw new UsernameNotFoundException(ex.getMessage());
+        } catch (org.springframework.security.authentication.BadCredentialsException ex) {
+            throw new BadCredentialsException("Invalid email or password.");
         }
-    }
 
-    public JwtResponse extractToken(JwtRequest jwtRequest) throws Exception {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getEmail(), jwtRequest.getPassword()));
-
-        } catch (UsernameNotFoundException ex) {
-            throw new com.usermanagement.exception.UsernameNotFoundException(ex.getMessage());
-        } catch (BadCredentialsException ex) {
-            throw new com.usermanagement.exception.BadCredentialsException("Email or password is invalid. Please try with correct credentials.");
-        }
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(jwtRequest.getEmail());
         String token = jwtUtil.generateToken(userDetails);
         String refreshToken = jwtUtil.generateRefreshToken(userDetails);
-        System.out.println("Generated token for username: " + userDetails.getUsername() + "-> " + token);
-        return new JwtResponse(token,refreshToken);
+        return new JwtResponse(token, refreshToken);
     }
-
-
 }

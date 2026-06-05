@@ -1,37 +1,75 @@
 package com.usermanagement.jwt;
 
+import com.usermanagement.config.UserManagementProperties;
 import com.usermanagement.exception.TokenExpiredException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.servlet.http.HttpServletRequest;
+import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-@Service
-public class JwtUtil {
-    private String secret = "administrator";
-    public static final long JWT_TOKEN_VALIDITY = 20 * 60 * 1000; //5 minutes
-    public static final long REFRESH_TOKEN_VALIDITY = 60 * 60 * 1000; //5 minutes
 
-    public String extractUsernameServletRequest(String token, HttpServletRequest request) {
+/**
+ * JWT utility — builds and validates tokens using JJWT 0.12.x.
+ *
+ * <p>Configuration comes from {@link UserManagementProperties.Jwt}.
+ * Override this bean in your project to use a different token structure.
+ */
+@Component
+@RequiredArgsConstructor
+public class JwtUtil {
+
+    private final UserManagementProperties properties;
+
+    // ── Token generation ──────────────────────────────────────────────────────
+
+    public String generateToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails.getUsername(),
+                properties.getJwt().getTokenValidityMs());
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails.getUsername(),
+                properties.getJwt().getRefreshTokenValidityMs());
+    }
+
+    private String buildToken(Map<String, Object> extra, String subject, long validityMs) {
+        return Jwts.builder()
+                .claims(extra)
+                .subject(subject)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + validityMs))
+                .signWith(signingKey())
+                .compact();
+    }
+
+    // ── Token validation ──────────────────────────────────────────────────────
+
+    public boolean validateToken(String token, UserDetails userDetails) {
         try {
-            return extractClaim(token, Claims::getSubject);
-        } catch (ExpiredJwtException e) {
-            request.setAttribute("tokenExpired","TokenExpiredException");
-            throw new TokenExpiredException("Session is expired. Please login in again.");
+            String username = extractUsername(token);
+            return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
         }
     }
+
+    // ── Claim extraction ──────────────────────────────────────────────────────
+
     public String extractUsername(String token) {
         try {
             return extractClaim(token, Claims::getSubject);
         } catch (ExpiredJwtException e) {
-            throw new TokenExpiredException("Session is expired. Please login in again.");
+            throw new TokenExpiredException("Session expired. Please log in again.");
         }
     }
 
@@ -40,51 +78,25 @@ public class JwtUtil {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+        return claimsResolver.apply(extractAllClaims(token));
     }
+
+    // ── Internal helpers ──────────────────────────────────────────────────────
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(signingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    private Boolean isTokenExpired(String token) {
+    private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername());
-    }
-    public String generateRefreshToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        return createRefreshToken(claims, userDetails.getUsername());
-    }
-
-    private String createToken(Map<String, Object> claims, String subject) {
-
-        return Jwts.builder()
-                .setClaims(claims).setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-    }
-    private String createRefreshToken(Map<String, Object> claims, String subject) {
-
-        return Jwts.builder()
-                .setClaims(claims).setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-    }
-
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    private SecretKey signingKey() {
+        byte[] keyBytes = properties.getJwt().getSecret().getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

@@ -1,23 +1,30 @@
 package com.usermanagement.service;
 
 import com.usermanagement.config.CustomUserDetails;
-import com.usermanagement.modelentity.User;
 import com.usermanagement.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+
+/**
+ * Default {@link UserDetailsService} that loads users by email from
+ * the library's {@link UserRepository}.
+ *
+ * <p>Override this bean (provide your own {@code UserDetailsService} bean)
+ * to load a custom user entity or from a different source.
+ */
+@RequiredArgsConstructor
 @Slf4j
-@Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("given email not found"));
-        return new CustomUserDetails(user);
+        return userRepository.findByEmail(email)
+                .map(CustomUserDetails::new)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }
 }

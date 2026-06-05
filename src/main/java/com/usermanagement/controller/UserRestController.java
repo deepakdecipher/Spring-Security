@@ -6,108 +6,127 @@ import com.usermanagement.modelresponse.JwtResponse;
 import com.usermanagement.modelresponse.UserResponse;
 import com.usermanagement.service.UserService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Default user REST controller.
+ *
+ * <p><b>Configuring the base path:</b> set {@code user-management.api.user-base-path}
+ * in your {@code application.yaml} (default: {@code /userApi}).
+ *
+ * <p><b>Overriding individual endpoints:</b> create your own controller class
+ * annotated with {@code @RestController} and set it as the missing bean:
+ * <pre>
+ * {@literal @}Bean
+ * {@literal @}Primary
+ * public UserRestController myController(UserService svc, JwtService jwt) {
+ *     return new MyCustomUserController(svc, jwt);
+ * }
+ * </pre>
+ * Or simply extend this class and override the methods you need.
+ *
+ * <p>Backed off when the consuming app provides its own {@code UserRestController} bean.
+ */
 @RestController
-@RequestMapping("/userApi")
-@AllArgsConstructor
+@RequestMapping("${user-management.api.user-base-path:/userApi}")
+@RequiredArgsConstructor
 public class UserRestController {
 
-    UserService userService;
-    JwtService jwtService;
+    private final UserService userService;
+    private final JwtService jwtService;
 
-    //LOGIN
+    // ── Public ─────────────────────────────────────────────────────────────────
+
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@Valid @RequestBody JwtRequest jwtRequest) {
-        return new ResponseEntity<>(jwtService.generateToken(jwtRequest), HttpStatus.OK);
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody JwtRequest request) {
+        return ResponseEntity.ok(jwtService.generateToken(request));
     }
-    // SIGN-UP
-    @PreAuthorize("permitAll()")
+
     @PostMapping("/sign-up")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UserResponse> signUp(@Valid @RequestBody UserSignUp userSignUp) {
-        return new ResponseEntity<>(userService.save(userSignUp), HttpStatus.OK);
+    public ResponseEntity<UserResponse> signUp(@Valid @RequestBody UserSignUp request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
     }
-    // UPDATE USER
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @PutMapping("/update/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable("id") Long id, @Valid @RequestBody UserUpdate userUpdate) {
-        return new ResponseEntity<>(userService.updateUserDetails(id, userUpdate), HttpStatus.OK);
+
+    @PostMapping("/verify-otp/{otp}")
+    public ResponseEntity<String> verifyOtp(
+            @PathVariable String otp,
+            @RequestParam String emailId) {
+        return ResponseEntity.ok(userService.verifyOtp(otp, emailId));
     }
-    // LIST ALL USERS
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPassword request) {
+        return ResponseEntity.ok(userService.resetPassword(request));
+    }
+
+    // ── Authenticated ─────────────────────────────────────────────────────────
+
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
+    @PostMapping("/generate-otp/{emailId}")
+    public ResponseEntity<String> generateOtp(@PathVariable String emailId) {
+        return ResponseEntity.ok(userService.generateOtp(emailId));
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<UserResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
+    }
+
+    // ── Admin only ─────────────────────────────────────────────────────────────
+
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> listAllUsers() {
-        return new ResponseEntity<>(userService.listAll(), HttpStatus.OK);
+    public ResponseEntity<List<UserResponse>> listAll() {
+        return ResponseEntity.ok(userService.listAll());
     }
 
-    // FETCH LOGGED IN USERS
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> fetchLIU() {
-        return new ResponseEntity<>(userService.findLIU(), HttpStatus.OK);
+    public ResponseEntity<UserResponse> me() {
+        return ResponseEntity.ok(userService.findLIU());
     }
 
-    // FETCH USERS EXCEPT LOGGED IN USER
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @GetMapping("/list")
-    public ResponseEntity<List<UserResponse>> fetchAllUsersExceptLIU() {
-        return new ResponseEntity<>(userService.findUsersExceptLIU(), HttpStatus.OK);
-    }
-    // FETCH USER BY FULL NAME
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @GetMapping("/fullname/{fullName}")
-    public ResponseEntity<List<UserResponse>> findUserByFullName(@PathVariable("fullName") String fullName) {
-        return new ResponseEntity<>(userService.findByFullName(fullName), HttpStatus.OK);
-    }
-    // FETCH USER BY USER NAME
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @GetMapping("/username/{email}")
-    public ResponseEntity<UserResponse> findUserByUserName(@PathVariable("email") String userName) {
-        return new ResponseEntity<>(userService.findByUserName(userName),HttpStatus.OK);
-    }
-    // FIND USER BY ID
-    @GetMapping("/id/{id}")
-    @ResponseStatus(HttpStatus.FOUND)
-    public ResponseEntity<UserResponse> findUserById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
-    }
-    // RESET PASSWORD
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @PostMapping(value = "/reset-password",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPassword resetPassword) {
-        return new ResponseEntity<>(userService.resetPassword(resetPassword), HttpStatus.OK);
+    public ResponseEntity<List<UserResponse>> listExceptSelf() {
+        return ResponseEntity.ok(userService.findUsersExceptLIU());
     }
 
-    // ASSIGN ROLE TO USERS
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @PostMapping(value = "/add-roles",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addRolesToUsers(@Valid @RequestBody AssignRolesToUser assignRolesToUser) {
-        return new ResponseEntity<>(userService.addRoleToUser(assignRolesToUser),HttpStatus.OK);
+    @GetMapping("/fullname/{fullName}")
+    public ResponseEntity<List<UserResponse>> findByFullName(@PathVariable String fullName) {
+        return ResponseEntity.ok(userService.findByFullName(fullName));
     }
-    // DELETE USER BY ID
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @GetMapping("/username/{userName}")
+    public ResponseEntity<UserResponse> findByUserName(@PathVariable String userName) {
+        return ResponseEntity.ok(userService.findByUserName(userName));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PutMapping("/update/{id}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UserUpdate request) {
+        return ResponseEntity.ok(userService.updateUserDetails(id, request));
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PostMapping("/add-roles")
+    public ResponseEntity<String> addRoles(@Valid @RequestBody AssignRolesToUser request) {
+        return ResponseEntity.ok(userService.addRoleToUser(request));
+    }
+
     @PreAuthorize("hasAnyAuthority('ADMIN')")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<UserResponse> deleteUserById(@PathVariable("id") Long id) {
-        return new ResponseEntity<>(userService.deleteUserById(id), HttpStatus.OK);
-    }
-    //GENERATE OTP
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    @PostMapping(value = "/generate-otp/{emailId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> generateOtp(@PathVariable("emailId") String emailId) {
-        return new ResponseEntity<>(userService.generateOtp(emailId), HttpStatus.OK);
-    }
-    //VERIFY OTP
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
-    @PostMapping(value = "/verify-otp/{otp}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> verifyOtp(@PathVariable("otp") String otp, @RequestParam("emailId") String emailId) {
-        return new ResponseEntity<>(userService.verifyOtp(otp, emailId), HttpStatus.OK);
+    public ResponseEntity<UserResponse> deleteUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.deleteUserById(id));
     }
 }

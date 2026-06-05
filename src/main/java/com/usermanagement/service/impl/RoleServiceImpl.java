@@ -72,7 +72,9 @@ public class RoleServiceImpl implements RoleService {
             Set<Role> roles = user.getRoles();
             if (roles.contains(oldRole)) {
                 roles.remove(oldRole);
-                roles.add(newRole);
+                if (newRole != null) {
+                    roles.add(newRole);
+                }
                 userRepository.save(user);
             }
         });

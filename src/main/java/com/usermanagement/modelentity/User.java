@@ -1,30 +1,26 @@
 package com.usermanagement.modelentity;
 
-import com.usermanagement.constants.ValidationMessageConstants.*;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import java.util.Set;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import static com.usermanagement.constants.ValidationMessageConstants.*;
-
+/**
+ * Default concrete user entity provided by the library.
+ *
+ * <p>Contains all fields from {@link BaseUser} (id, email, password, roles, etc.).
+ * If you need to add application-specific fields, extend {@link BaseUser} directly
+ * in your project — the library will back off its own beans automatically.
+ */
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-@Entity(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String userFullName;
-    private String userName;
-    public String password;
-    private String email;
-    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private Set<Role> roles;
-    private Boolean isVerified;
-
+public class User extends BaseUser {
+    // All fields inherited from BaseUser.
+    // Extend BaseUser in your own project to add custom fields.
 }
