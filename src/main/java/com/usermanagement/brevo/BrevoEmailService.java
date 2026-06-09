@@ -78,14 +78,15 @@ public class BrevoEmailService implements EmailService {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                log.error("Brevo API error {}: {}", response.statusCode(), response.body());
-                throw new EmailProcessException("Brevo API returned error " + response.statusCode() + ": " + response.body());
+                log.error("Brevo API error {} sending to {}: {}", response.statusCode(), userEmail, response.body());
+                throw new EmailProcessException("Failed to send verification email. Please try again later.");
             }
             log.debug("Email sent via Brevo to {}", userEmail);
         } catch (EmailProcessException e) {
             throw e;
         } catch (Exception e) {
-            throw new EmailProcessException("Failed to send email via Brevo to " + userEmail + ": " + e.getMessage());
+            log.error("Brevo email error for {}: {}", userEmail, e.getMessage());
+            throw new EmailProcessException("Failed to send verification email. Please try again later.");
         }
     }
 
