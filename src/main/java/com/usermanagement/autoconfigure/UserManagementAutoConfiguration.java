@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.usermanagement.config.UserManagementProperties;
 import com.usermanagement.emailservice.EmailService;
 import com.usermanagement.emailservice.emailserviceimpl.EmailServiceImpl;
+import com.usermanagement.brevo.BrevoEmailService;
 import com.usermanagement.exceptionhandler.CustomAccessDeniedHandler;
 import com.usermanagement.exceptionhandler.CustomExceptionHandler;
 import com.usermanagement.jwt.JwtAuthenticationFilter;
@@ -74,8 +75,11 @@ public class UserManagementAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(EmailService.class)
-    public EmailServiceImpl emailService(ObjectProvider<JavaMailSender> mailSender,
-                                        UserManagementProperties properties) {
+    public EmailService emailService(ObjectProvider<JavaMailSender> mailSender,
+                                     UserManagementProperties properties) {
+        if ("brevo".equalsIgnoreCase(properties.getEmail().getProvider())) {
+            return new BrevoEmailService(properties);
+        }
         return new EmailServiceImpl(mailSender, properties);
     }
 
@@ -100,6 +104,7 @@ public class UserManagementAutoConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/userApi/login",
+                                "/userApi/login-otp",
                                 "/userApi/sign-up",
                                 "/userApi/verify-otp/**",
                                 "/userApi/generate-otp/**",

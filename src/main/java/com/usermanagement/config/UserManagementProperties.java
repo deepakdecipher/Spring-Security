@@ -47,6 +47,9 @@ public class UserManagementProperties {
     @NestedConfigurationProperty
     private Email email = new Email();
 
+    @NestedConfigurationProperty
+    private Brevo brevo = new Brevo();
+
     @Getter
     @Setter
     public static class Api {
@@ -88,5 +91,17 @@ public class UserManagementProperties {
         private String subject = "Your OTP verification code";
         /** Set false to disable email sending (useful in dev/test). */
         private boolean enabled = true;
+        /**
+         * Email provider: "smtp" (uses Spring Mail) or "brevo" (uses Brevo API).
+         * Default is "smtp". Set to "brevo" when SMTP port is blocked (e.g. Render free tier).
+         */
+        private String provider = "smtp";
+    }
+
+    @Getter
+    @Setter
+    public static class Brevo {
+        /** Brevo (Sendinblue) API key — obtain from https://app.brevo.com/settings/keys/api */
+        private String apiKey = "";
     }
 }

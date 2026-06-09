@@ -48,6 +48,11 @@ public class UserRestController {
         return ResponseEntity.ok(jwtService.generateToken(request));
     }
 
+    @PostMapping("/login-otp")
+    public ResponseEntity<JwtResponse> loginWithOtp(@Valid @RequestBody LoginOtpRequest request) {
+        return ResponseEntity.ok(jwtService.generateTokenFromOtp(request));
+    }
+
     @PostMapping("/sign-up")
     public ResponseEntity<UserResponse> signUp(@Valid @RequestBody UserSignUp request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(request));
@@ -67,7 +72,6 @@ public class UserRestController {
 
     // ── Authenticated ─────────────────────────────────────────────────────────
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     @PostMapping("/generate-otp/{emailId}")
     public ResponseEntity<String> generateOtp(@PathVariable String emailId) {
         return ResponseEntity.ok(userService.generateOtp(emailId));

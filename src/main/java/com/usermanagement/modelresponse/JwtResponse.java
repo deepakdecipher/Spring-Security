@@ -2,6 +2,8 @@ package com.usermanagement.modelresponse;
 
 import lombok.*;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -10,4 +12,5 @@ import lombok.*;
 public class JwtResponse {
     String token;
     String refreshToken;
+    Set<String> roles;
 }
