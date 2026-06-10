@@ -50,6 +50,9 @@ public class UserManagementProperties {
     @NestedConfigurationProperty
     private Brevo brevo = new Brevo();
 
+    @NestedConfigurationProperty
+    private Firebase firebase = new Firebase();
+
     @Getter
     @Setter
     public static class Api {
@@ -92,8 +95,8 @@ public class UserManagementProperties {
         /** Set false to disable email sending (useful in dev/test). */
         private boolean enabled = true;
         /**
-         * Email provider: "smtp" (uses Spring Mail) or "brevo" (uses Brevo API).
-         * Default is "smtp". Set to "brevo" when SMTP port is blocked (e.g. Render free tier).
+         * Email provider: "smtp" (uses Spring Mail) or "resend" (uses Resend API).
+         * Default is "smtp". Set to "resend" when SMTP port is blocked (e.g. Render free tier).
          */
         private String provider = "smtp";
     }
@@ -103,5 +106,12 @@ public class UserManagementProperties {
     public static class Brevo {
         /** Brevo (Sendinblue) API key — obtain from https://app.brevo.com/settings/keys/api */
         private String apiKey = "";
+    }
+
+    @Getter
+    @Setter
+    public static class Firebase {
+        /** Firebase project ID — used to verify phone auth ID tokens from the client. */
+        private String projectId = "";
     }
 }

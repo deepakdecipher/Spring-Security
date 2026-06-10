@@ -55,6 +55,10 @@ public abstract class BaseUser {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Set<Role> roles = new HashSet<>();
 
+    /** Phone number in E.164 format (e.g. +919876543210). Null for email-only users. */
+    @Column(unique = true)
+    private String phoneNumber;
+
     /** False until the user verifies their email OTP. */
     @Builder.Default
     @Column(name = "is_verified", nullable = false)

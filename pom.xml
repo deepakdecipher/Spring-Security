@@ -91,6 +91,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Jackson — JSON parsing for Firebase JWKS / JWT header -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
         <!-- Guava — LoadingCache for OTP storage -->
         <dependency>
             <groupId>com.google.guava</groupId>
