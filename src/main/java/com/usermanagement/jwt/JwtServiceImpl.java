@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.jsonwebtoken.JwtException;
+
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
@@ -56,5 +58,25 @@ public class JwtServiceImpl implements JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
         return new JwtResponse(token, refreshToken, roles);
+    }
+
+    @Override
+    public JwtResponse refreshToken(String refreshToken) {
+        String username;
+        try {
+            username = jwtUtil.extractUsername(refreshToken);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new BadCredentialsException("Refresh token is invalid or expired. Please log in again.");
+        }
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+        if (!jwtUtil.validateToken(refreshToken, userDetails)) {
+            throw new BadCredentialsException("Refresh token is invalid or expired. Please log in again.");
+        }
+        String newToken = jwtUtil.generateToken(userDetails);
+        String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
+        Set<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+        return new JwtResponse(newToken, newRefreshToken, roles);
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 import java.util.List;
 
 /**
@@ -51,6 +53,15 @@ public class UserRestController {
     @PostMapping("/login-otp")
     public ResponseEntity<JwtResponse> loginWithOtp(@Valid @RequestBody LoginOtpRequest request) {
         return ResponseEntity.ok(jwtService.generateTokenFromOtp(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refresh(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken == null || refreshToken.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(jwtService.refreshToken(refreshToken));
     }
 
     @PostMapping("/sign-up")

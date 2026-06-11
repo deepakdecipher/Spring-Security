@@ -9,4 +9,6 @@ public interface JwtService {
     JwtResponse generateToken(JwtRequest jwtRequest);
 
     JwtResponse generateTokenFromOtp(LoginOtpRequest request);
+
+    JwtResponse refreshToken(String refreshToken);
 }

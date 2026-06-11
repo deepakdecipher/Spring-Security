@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -73,5 +74,10 @@ public class ExceptionControllerAdvice extends RuntimeException {
     @ExceptionHandler(OtpExpiredException.class)
     public ResponseEntity<ExceptionResponse> otpExpiredException(OtpExpiredException ex) {
         return new ResponseEntity<>(new ExceptionResponse(400, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ExceptionResponse> badCredentialsException(BadCredentialsException ex) {
+        return new ResponseEntity<>(new ExceptionResponse(401, ex.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 }

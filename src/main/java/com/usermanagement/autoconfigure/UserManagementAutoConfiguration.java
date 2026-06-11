@@ -105,6 +105,7 @@ public class UserManagementAutoConfiguration {
                         .requestMatchers(
                                 "/userApi/login",
                                 "/userApi/login-otp",
+                                "/userApi/refresh",
                                 "/userApi/sign-up",
                                 "/userApi/verify-otp/**",
                                 "/userApi/generate-otp/**",
